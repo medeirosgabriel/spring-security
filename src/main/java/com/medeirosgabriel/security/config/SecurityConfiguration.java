@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static com.medeirosgabriel.security.model.Permission.ADMIN_CREATE;
 import static com.medeirosgabriel.security.model.Permission.ADMIN_DELETE;
@@ -40,7 +41,7 @@ public class SecurityConfiguration {
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http
+    http.headers().frameOptions().sameOrigin().and()
         .csrf()
         .disable()
         .authorizeHttpRequests()
@@ -57,7 +58,7 @@ public class SecurityConfiguration {
                 "/webjars/**",
                 "/swagger-ui.html"
         ).permitAll()
-
+        .requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
         .requestMatchers("/api/v1/management/**").hasAnyRole(Role.ADMIN.name(), Role.MANAGER.name())
         .requestMatchers(GET, "/api/v1/management/**").hasAnyAuthority(ADMIN_READ.name(), MANAGER_READ.name())
         .requestMatchers(POST, "/api/v1/management/**").hasAnyAuthority(ADMIN_CREATE.name(), MANAGER_CREATE.name())
